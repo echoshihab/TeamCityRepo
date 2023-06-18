@@ -1,0 +1,110 @@
+{
+	"info": {
+		"_postman_id": "4d852038-58d1-4472-9396-ecbe296fb91e",
+		"name": "TestRunner",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login Completed with 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"let session_cookie = (pm.response.headers.filter(h => h.key == \"Set-Cookie\").find(h => h.value.startsWith(\"Test\")));\r",
+							"\r",
+							"pm.collectionVariables.set(\"session_cookie\", session_cookie)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"test\",\r\n    \"password\": \"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5287/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5287",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let session_cookie = pm.collectionVariables.get(\"session_cookie\");\r",
+							"\r",
+							"pm.request.headers.add({\r",
+							"    key: 'Cookie',\r",
+							"    value: session_cookie\r",
+							"})\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Retrieved test data Ok\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(pm.response.json().length).to.equal(2)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5287/testdata",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5287",
+					"path": [
+						"testdata"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "session_cookie",
+			"value": ""
+		}
+	]
+}
