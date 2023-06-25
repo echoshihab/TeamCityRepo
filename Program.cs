@@ -1,6 +1,18 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.Hosting.WindowsServices;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = WindowsServiceHelpers.IsWindowsService() ? AppContext.BaseDirectory : default
+});
+
+#if !DEBUG
+			if (args.Contains("--console") == false && OperatingSystem.IsWindows())
+			{
+				builder.Host.UseWindowsService();
+			}
+#endif
 
 // Add services to the container.
 
